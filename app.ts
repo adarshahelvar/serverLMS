@@ -3,6 +3,7 @@ export const app = express();
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import { ErrorMiddleware } from "./middleware/error";
 
 dotenv.config();
 
@@ -30,6 +31,8 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Invalid route ${req.originalUrl} not found`) as any;
   err.status = 404;
   next(err);
-// res.status(404).json({ message: `Invalid route ${req.originalUrl} not found` });
-/* In above two error use any one, Both serve same purpose*/
+  // res.status(404).json({ message: `Invalid route ${req.originalUrl} not found` });
+  /* In above two error use any one, Both serve same purpose*/
 });
+
+app.use(ErrorMiddleware);
