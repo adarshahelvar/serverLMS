@@ -1,29 +1,34 @@
 import express, { NextFunction, Request, Response } from "express";
-export const app = express();
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import { ErrorMiddleware } from "./middleware/error";
+import userRouter from "./routes/user.route";
 
 dotenv.config();
 
-// body parser
+export const app = express();
+
+// body parser with increased limit
+// app.use(express.json());
 app.use(express.json({ limit: "50mb" }));
 
 // cookie parser
 app.use(cookieParser());
 
-// Cors => cross origin resource sharing
-
+// Cors => cross-origin resource sharing
 app.use(
   cors({
     origin: process.env.ORIGIN,
   })
 );
 
+// Routing
+app.use("/api/v1", userRouter);
+
 // Testing api
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ message: `Api is in working...!` });
+  res.status(200).json({ message: `API is working...!` });
 });
 
 // Unknown Route
