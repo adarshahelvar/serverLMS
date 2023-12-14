@@ -10,8 +10,8 @@ dotenv.config();
 export const app = express();
 
 // body parser with increased limit
-// app.use(express.json());
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json());
+// app.use(express.json({ limit: "50mb" }));
 
 // cookie parser
 app.use(cookieParser());
@@ -25,6 +25,10 @@ app.use(
 
 // Routing
 app.use("/api/v1", userRouter);
+// app.post("/api/v1/activate-user", (req, res) => {
+//   console.log("Request Headers:", req.headers);
+//   console.log("Request Body:", req.body);
+// });
 
 // Testing api
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
