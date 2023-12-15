@@ -7,6 +7,7 @@ require("dotenv").config();
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
+import { sendToken } from "../utils/jwt";
 
 // Register user
 interface IRegistrationBody {
@@ -65,6 +66,7 @@ interface IActivationToken {
   activationCode: string;
 }
 
+// OTP creation
 export const createActivationToken = (user: any): IActivationToken => {
   const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
   const token = jwt.sign(
@@ -87,7 +89,7 @@ interface IActivationRequest {
 export const activateUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("Request Body:", req.body);
+      // console.log("Request Body:", req.body);
       const { activation_token, activation_code } =
         req.body as IActivationRequest;
 
@@ -118,6 +120,54 @@ export const activateUser = CatchAsyncError(
       res
         .status(200)
         .json({ success: true, message: "User successfully created." });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// User Login
+interface ILoginRequest {
+  email: string;
+  password: string;
+}
+
+export const loginUser = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body as ILoginRequest;
+      if (!email || !password) {
+        return next(new ErrorHandler(`Please enter email and password`, 400));
+      }
+
+      const user = await userModel.findOne({ email }).select("+password");
+      if (!user) {
+        return next(new ErrorHandler(`Invalid email and password`, 400));
+      }
+      const isPasswordMath = await user.comparePasswords(password);
+
+      if (!isPasswordMath) {
+        return next(new ErrorHandler(`Invalid password`, 400));
+      }
+
+      sendToken(user, 200, res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// Logout user
+
+export const logoutUser = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.cookie("access_token", "", { maxAge: 1 });
+      res.cookie("refresh_token", "", { maxAge: 1 });
+      res.status(200).json({
+        success: true,
+        message: "User logged out successfully",
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
