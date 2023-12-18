@@ -76,12 +76,16 @@ UserSchema.pre<IUser>("save", async function (next) {
 
 // Sign access token : When use login we create a new token and add it
 UserSchema.methods.SignAccessToken = function () {
-  return jwt.sign({id: this._id}, process.env.ACCESS_TOKEN ||'')
+  return jwt.sign({id: this._id}, process.env.ACCESS_TOKEN ||'', {
+    expiresIn: "5m"
+  })
 };
 
 // Sign refresh token 
 UserSchema.methods.SignRefreshToken = function () {
-  return jwt.sign({id: this._id}, process.env.REFRESH_TOKEN ||'')
+  return jwt.sign({id: this._id}, process.env.REFRESH_TOKEN ||'', {
+    expiresIn: "3d"
+  })
 
 }
 

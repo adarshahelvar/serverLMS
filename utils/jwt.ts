@@ -13,39 +13,40 @@ interface ITokenOptions {
   sameSite: "lax" | "strict" | "none" | undefined;
   secure?: boolean;
 }
+// parse enivironment variables to integrate with fallback values
+
+export const accessTokenExpire = parseInt(
+  process.env.ACCESS_TOKEN_EXPIRE || "300",
+  10
+);
+export const refreshTokenExpire = parseInt(
+  process.env.REFRESH_TOKEN_EXPIRE || "1200",
+  10
+);
+
+// Options for cookies
+export const accessTokenOptions: ITokenOptions = {
+  expire: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
+  maxAge: accessTokenExpire * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: "lax",
+};
+
+export const refreshTokenOptions: ITokenOptions = {
+  expire: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
+  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: "lax",
+};
 
 export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   const accessToken = user.SignAccessToken();
   const refreshToken = user.SignRefreshToken();
 
   // Upload session to redis for maintaining cache
-  redis.set(user._id, JSON.stringify(user) as any)
+  redis.set(user._id, JSON.stringify(user) as any);
 
-  // parse enivironment variables to integrate with fallback values
-
-  const accessTokenExpire = parseInt(
-    process.env.ACCESS_TOKEN_EXPIRE || "300",
-    10
-  );
-  const refreshTokenExpire = parseInt(
-    process.env.REFRESH_TOKEN_EXPIRE || "1200",
-    10
-  );
-
-  // Options for cookies
-  const accessTokenOptions: ITokenOptions = {
-    expire: new Date(Date.now() + accessTokenExpire * 1000),
-    maxAge: accessTokenExpire * 1000,
-    httpOnly: true,
-    sameSite: "lax",
-  };
-
-  const refreshTokenOptions: ITokenOptions = {
-    expire: new Date(Date.now() + refreshTokenExpire * 1000),
-    maxAge: refreshTokenExpire * 1000,
-    httpOnly: true,
-    sameSite: "lax",
-  };
+  
 
   //   Only set secure to true in production
   if (process.env.NODE_ENV === "production") {
@@ -63,4 +64,3 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
     accessToken,
   });
 };
-
