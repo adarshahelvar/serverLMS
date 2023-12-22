@@ -13,7 +13,7 @@ import {
   sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById } from "./services/user.services";
+import { getUserById } from "../services/user.services";
 import cloudinary from "cloudinary";
 
 interface ExtendedRequest extends Request {

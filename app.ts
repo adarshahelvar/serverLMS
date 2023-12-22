@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
+import courseRouter from "./routes/course.route";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(
 
 // Routing
 app.use("/api/v1", userRouter);
+app.use("/api/v1", courseRouter);
 // app.post("/api/v1/activate-user", (req, res) => {
 //   console.log("Request Headers:", req.headers);
 //   console.log("Request Body:", req.body);
