@@ -7,6 +7,13 @@ import { createCourse } from "../services/course.services";
 import CourseModel from "../models/course.model";
 import { redis } from "../utils/redis";
 
+// Extend the Request interface to include user property
+interface CustomRequest extends Request {
+  user?: {
+    courses: Array<{ _id: string }>; // Update this type according to your user model
+  };
+}
+
 // Upload course
 export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -126,6 +133,34 @@ export const getAllCourse = CatchAsyncError(
           courses,
         });
       }
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+// Get course content-- Only for valid user
+
+export const getCourseByUser = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const userCourseList = req.user?.courses;
+      // console.log(userCourseList);
+      const courseId = req.params.id;
+      const courseExists = userCourseList?.find(
+        (course: any) => course._id.toString() === courseId
+      );
+      if (!courseExists) {
+        return next(
+          new ErrorHandler(`You are not eligible to access this course`, 404)
+        );
+      }
+      const course = await CourseModel.findById(courseId);
+      const content = course?.courseData;
+      res.status(200).json({
+        success: true,
+        content,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
