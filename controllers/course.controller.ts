@@ -6,6 +6,7 @@ import { createContext } from "vm";
 import { createCourse } from "../services/course.services";
 import CourseModel from "../models/course.model";
 import { redis } from "../utils/redis";
+import mongoose from "mongoose";
 
 // Extend the Request interface to include user property
 interface CustomRequest extends Request {
@@ -166,3 +167,55 @@ export const getCourseByUser = CatchAsyncError(
     }
   }
 );
+
+// Add question in course
+interface IAddQuestionData {
+  question: string;
+  courseId: string;
+  contentId: string;
+}
+
+export const addQuestion = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const { question, courseId, contentId }: IAddQuestionData =
+        await req.body;
+      const course = await CourseModel.findById(courseId);
+
+      if (!mongoose.Types.ObjectId.isValid(courseId)) {
+        return next(new ErrorHandler(`Invalid content ID`, 500));
+      }
+
+      const courseContentId = course?.courseData?.map((item) => item._id);
+
+      const courseContent = course?.courseData?.find((item: any) =>
+        courseContentId?.includes(item._id)
+      );
+
+      if (!courseContent) {
+        return next(new ErrorHandler(`Invalid content ID`, 500));
+      }
+
+      // Create a new question object
+      const newQuestion: any = {
+        user: req.user,
+        question,
+        questionReplies: [],
+      };
+
+      // Add this question to course content
+      courseContent.questions.push(newQuestion);
+
+      // Save the updated course
+      await course?.save();
+
+      res.status(200).json({
+        success: true,
+        course,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
