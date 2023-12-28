@@ -471,7 +471,11 @@ export const addReplayReview = CatchAsyncError(
         user: req.user,
         comment,
       };
-      course.reviews.push(replayData);
+      // course.reviews?.commentReplies.push(replayData);
+      if (!review.commentReplies) {
+        review.commentReplies = [];
+      }
+      review.commentReplies?.push(replayData);
       await course.save();
 
       res.status(200).json({
