@@ -15,6 +15,7 @@ import sendMail from "../utils/sendMail";
 interface CustomRequest extends Request {
   user?: {
     courses: Array<{ _id: string }>; // Update this type according to your user model
+    name: string;
   };
 }
 
@@ -230,7 +231,6 @@ interface IAddAnswerData {
   questionId: string;
 }
 
-
 // export const addAnswer = CatchAsyncError(
 //   async (req: CustomRequest, res: Response, next: NextFunction) => {
 //     try {
@@ -310,6 +310,7 @@ export const addAnswer = CatchAsyncError(
     try {
       const { answer, courseId, contentId, questionId }: IAddAnswerData =
         await req.body;
+      // console.log("Request Body:", req.body)
       const course = await CourseModel.findById(courseId);
 
       if (!mongoose.Types.ObjectId.isValid(courseId)) {
@@ -360,7 +361,6 @@ export const addAnswer = CatchAsyncError(
           path.join(__dirname, "../mails/question-replay.ejs"),
           data
         );
-
         // console.log(html)
         try {
           await sendMail({
@@ -384,3 +384,102 @@ export const addAnswer = CatchAsyncError(
   }
 );
 
+// Add review in course
+interface IAddReviewData {
+  review: string;
+  courseId: string;
+  rating: number;
+  userId: string;
+}
+
+export const addReview = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const userCourseList = req.user?.courses;
+      const courseId = req.params.id;
+      // Check if ourse ID exists in user course list based on _id
+      const courseExists = userCourseList?.some(
+        (course: any) => course._id.toString() === courseId.toString()
+      );
+
+      if (!courseExists) {
+        return next(
+          new ErrorHandler(`You are not eligible to access this course`, 500)
+        );
+      }
+      const course = await CourseModel.findById(courseId);
+
+      const { review, rating } = req.body as IAddReviewData;
+
+      const reviewData: any = {
+        user: req.user,
+        comment: review,
+        rating,
+      };
+      course?.reviews.push(reviewData);
+      let avg = 0;
+      course?.reviews.forEach((rev: any) => {
+        avg += rev.rating;
+      });
+      if (course) {
+        course.ratings = avg / course?.reviews.length;
+      }
+      await course?.save();
+
+      // console.log(req.user?.name)
+
+      const notification = {
+        title: "New Review Recived",
+        message: `${req.user?.name} has given review in ${course?.name} `,
+      };
+      // Create a notification
+
+      res.status(200).json({
+        success: true,
+        course,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+// Replies to review array.
+
+interface IAddReviewData {
+  comment: string;
+  courseId: string;
+  reviewId: number;
+}
+
+export const addReplayReview = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const { comment, courseId, reviewId } = req.body as IAddReviewData;
+      const course = await CourseModel.findById(courseId);
+      if (!course) {
+        return next(new ErrorHandler(`Course not found`, 404));
+      }
+      const review = course?.reviews?.find(
+        (rev: any) => rev._id.toString() === reviewId
+      );
+      if (!review) {
+        return next(new ErrorHandler(`Review not found`, 404));
+      }
+
+      const replayData: any = {
+        user: req.user,
+        comment,
+      };
+      course.reviews.push(replayData);
+      await course.save();
+
+      res.status(200).json({
+        success: true,
+        course,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
