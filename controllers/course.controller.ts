@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
+import NotificationModel from "../models/notification.model";
 
 // Extend the Request interface to include user property
 interface CustomRequest extends Request {
@@ -210,6 +211,12 @@ export const addQuestion = CatchAsyncError(
       // Add this question to course content
       courseContent.questions.push(newQuestion);
 
+      await NotificationModel.create({
+        user: req.user,
+        title: "New Question",
+        message: `You have new Question in  a course: ${course?.name} and video name: ${courseContent.title} from ${req?.user?.name}`,
+      });
+
       // Save the updated course
       await course?.save();
 
@@ -351,7 +358,11 @@ export const addAnswer = CatchAsyncError(
       const userWithId = req.user as { _id?: string } | undefined;
 
       if (userWithId?._id === question.user._id) {
-        // Create a notification
+        await NotificationModel.create({
+          user: req?.user,
+          title: "New Question Replay Recieved",
+          message: `You have new Question in  a course: ${course?.name} and video name: ${courseContent.title} from ${req?.user?.name}`,
+        });
       } else {
         const data = {
           name: question.user.name,
