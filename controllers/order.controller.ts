@@ -8,7 +8,7 @@ import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
-import { newOrder } from "../services/order.services";
+import { getAllOrdersService, newOrder } from "../services/order.services";
 
 // Define an interface to extend the Request object
 interface CustomRequest extends Request {
@@ -85,3 +85,14 @@ export const createOrder = CatchAsyncError(
     }
   }
 );
+
+
+// Get all Order--Only for Admin
+export const getAllOrders = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      getAllOrdersService(res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })

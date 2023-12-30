@@ -13,7 +13,7 @@ import {
   sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById } from "../services/user.services";
+import { getAllUsersService, getUserById } from "../services/user.services";
 import cloudinary from "cloudinary";
 
 interface ExtendedRequest extends Request {
@@ -392,3 +392,14 @@ export const updateProfilePicture = CatchAsyncError(
     }
   }
 );
+
+
+// Get all users--Only for Admin
+export const getAllUsers = CatchAsyncError(
+  async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    try {
+      getAllUsersService(res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
