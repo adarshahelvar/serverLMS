@@ -1,13 +1,13 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { IUser } from "./user.model";
 
-export interface Iorder extends Document {
+export interface IOrder extends Document {
   courseId: string;
   userId: string;
   payment_info: object;
 }
 
-const orderSchema = new Schema<Iorder>(
+const orderSchema = new Schema<IOrder>(
   {
     courseId: {
       type: String,
@@ -27,5 +27,5 @@ const orderSchema = new Schema<Iorder>(
   }
 );
 
-const OrderModel: Model<Iorder> = mongoose.model("Order", orderSchema);
+const OrderModel: Model<IOrder> = mongoose.model("Order", orderSchema);
 export default OrderModel;
