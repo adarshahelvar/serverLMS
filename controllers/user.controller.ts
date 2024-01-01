@@ -13,7 +13,11 @@ import {
   sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getAllUsersService, getUserById } from "../services/user.services";
+import {
+  getAllUsersService,
+  getUserById,
+  updateUserRoleService,
+} from "../services/user.services";
 import cloudinary from "cloudinary";
 
 interface ExtendedRequest extends Request {
@@ -358,7 +362,7 @@ export const updateProfilePicture = CatchAsyncError(
       const { avatar } = req.body;
       const userId = req?.user?._id;
       const user = await userModel.findById(userId);
-      if(avatar && user){
+      if (avatar && user) {
         if (user?.avatar?.public_id) {
           // First delete old image and then upload new image
           await cloudinary.v2.uploader.destroy(user?.avatar?.public_id);
@@ -368,7 +372,7 @@ export const updateProfilePicture = CatchAsyncError(
           });
           user.avatar = {
             public_id: myCloud.public_id,
-            url: myCloud.secure_url
+            url: myCloud.secure_url,
           };
         } else {
           const myCloud = await cloudinary.v2.uploader.upload(avatar, {
@@ -377,22 +381,21 @@ export const updateProfilePicture = CatchAsyncError(
           });
           user.avatar = {
             public_id: myCloud.public_id,
-            url: myCloud.secure_url
+            url: myCloud.secure_url,
           };
         }
         await user?.save();
         await redis.set(userId, JSON.stringify(user));
-      res.status(200).json({
-        status: "success",
-        user,
-      });
+        res.status(200).json({
+          status: "success",
+          user,
+        });
       }
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
-
 
 // Get all users--Only for Admin
 export const getAllUsers = CatchAsyncError(
@@ -402,4 +405,18 @@ export const getAllUsers = CatchAsyncError(
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
-  })
+  }
+);
+
+// Update user role--Admin Only
+
+export const updateUserRole = CatchAsyncError(
+  async (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    try {
+      const { id, role } = req.body;
+      updateUserRoleService(res, id, role);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
