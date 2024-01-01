@@ -207,7 +207,7 @@ export const updateAccessToken = CatchAsyncError(
       }
       const session = await redis.get(decoded.id as string);
       if (!session) {
-        return next(new ErrorHandler(message, 400));
+        return next(new ErrorHandler("Please login for this resources", 400));
       }
 
       const user = JSON.parse(session);
@@ -232,6 +232,7 @@ export const updateAccessToken = CatchAsyncError(
 
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+      await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 604800 seconds means 7 days
 
       res.status(200).json({
         status: "success",
@@ -426,18 +427,18 @@ export const updateUserRole = CatchAsyncError(
 export const deleteUser = CatchAsyncError(
   async (req: ExtendedRequest, res: Response, next: NextFunction) => {
     try {
-      const {id} = await req.params;
+      const { id } = await req.params;
       const user = await userModel.findById(id);
-      if(!user){
+      if (!user) {
         return next(new ErrorHandler(`No user found`, 404));
       }
-      await user.deleteOne({id});
+      await user.deleteOne({ id });
       await redis.del(id);
       res.status(200).json({
-        status: "User deleted successfully", 
+        status: "User deleted successfully",
       });
-      
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
-  })
+  }
+);
