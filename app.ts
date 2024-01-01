@@ -8,6 +8,7 @@ import courseRouter from "./routes/course.route";
 import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
+import layoutRouter from "./routes/layout.route";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/api/v1", courseRouter);
 app.use("/api/v1", orderRouter);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1", analyticsRouter);
+app.use("/api/v1", layoutRouter);
 // app.post("/api/v1/activate-user", (req, res) => {
 //   console.log("Request Headers:", req.headers);
 //   console.log("Request Body:", req.body);
