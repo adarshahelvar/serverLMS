@@ -14,6 +14,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
+import axios from 'axios';
 
 // Extend the Request interface to include user property
 interface CustomRequest extends Request {
@@ -454,6 +455,30 @@ export const deleteCourse = CatchAsyncError(
       res.status(200).json({
         status: "Course deleted successfully",
       });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// Generate video url
+
+export const generateVideoUrl = CatchAsyncError(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const {videoId} = req.body;
+      const response = await axios.post(
+        `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+        {ttl: 300},
+        {
+          headers : {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+          },
+        }
+      )
+      res.json(response.data)
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
