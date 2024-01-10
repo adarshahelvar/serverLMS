@@ -14,7 +14,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
-import axios from 'axios';
+import axios from "axios";
 
 // Extend the Request interface to include user property
 interface CustomRequest extends Request {
@@ -124,25 +124,15 @@ export const getSingleCourse = CatchAsyncError(
 export const getAllCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const isCacheExist = await redis.get("allCourses");
-      if (isCacheExist) {
-        const course = JSON.parse(isCacheExist);
-        res.status(200).json({
-          success: true,
-          message: `Course data fetched successfully from Cache `,
-          course,
-        });
-      } else {
-        const courses = await CourseModel.find().select(
-          "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
-        );
-        await redis.set("allCorses", JSON.stringify(courses));
-        res.status(200).json({
-          success: true,
-          message: `Course data fetched successfully`,
-          courses,
-        });
-      }
+      const courses = await CourseModel.find().select(
+        "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+      );
+
+      res.status(200).json({
+        success: true,
+        message: `Course data fetched successfully`,
+        courses,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -466,19 +456,19 @@ export const deleteCourse = CatchAsyncError(
 export const generateVideoUrl = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-      const {videoId} = req.body;
+      const { videoId } = req.body;
       const response = await axios.post(
         `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
-        {ttl: 300},
+        { ttl: 300 },
         {
-          headers : {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
             Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
           },
         }
-      )
-      res.json(response.data)
+      );
+      res.json(response.data);
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
