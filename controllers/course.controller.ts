@@ -420,7 +420,7 @@ export const addReplayReview = CatchAsyncError(
 );
 
 // Get all courses--Only for Admin
-export const getAllCourses = CatchAsyncError(
+export const getAdminAllCourses = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
       getAllCoursesService(res);
