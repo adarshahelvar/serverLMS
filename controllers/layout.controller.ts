@@ -19,6 +19,7 @@ export const createLayout = CatchAsyncError(
           folder: "layout",
         });
         const banner = {
+          type: "Banner",
           image: {
             public_id: myCloud.public_id,
             url: myCloud.secure_url,
