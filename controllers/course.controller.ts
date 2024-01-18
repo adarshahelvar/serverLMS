@@ -275,6 +275,8 @@ export const addAnswer = CatchAsyncError(
       const newAnswer: any = {
         user: req.user,
         answer,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       // Add answer to course content
@@ -366,13 +368,21 @@ export const addReview = CatchAsyncError(
       }
       await course?.save();
 
+      await redis.set(courseId, JSON.stringify(course), "EX", 604800)
+
       // console.log(req.user?.name)
 
-      const notification = {
-        title: "New Review Recived",
-        message: `${req.user?.name} has given review in ${course?.name} `,
-      };
+      // const notification = {
+      //   title: "New Review Recived",
+      //   message: `${req.user?.name} has given review in ${course?.name} `,
+      // };
       // Create a notification
+
+      await NotificationModel.create({
+        user: req.user,
+        title: "New Review Recived",
+        message: `${req.user?.name} has given review in course ${course?.name} `,
+      });
 
       res.status(200).json({
         success: true,
@@ -410,13 +420,17 @@ export const addReplayReview = CatchAsyncError(
       const replayData: any = {
         user: req.user,
         comment,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       // course.reviews?.commentReplies.push(replayData);
       if (!review.commentReplies) {
         review.commentReplies = [];
       }
       review.commentReplies?.push(replayData);
+      
       await course.save();
+      await redis.set(courseId, JSON.stringify(course), "EX", 604800)
 
       res.status(200).json({
         success: true,
