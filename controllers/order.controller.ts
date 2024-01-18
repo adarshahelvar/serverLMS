@@ -23,14 +23,14 @@ export const createOrder = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
       const { courseId, payment_info } = req.body as IOrder;
-      if(payment_info){
-        if("id" in payment_info){
+      if (payment_info) {
+        if ("id" in payment_info) {
           const paymentIntentId = payment_info.id;
-          const paymentIntent = await stripe.paymentIntents.retrive(
+          const paymentIntent = await stripe.paymentIntents.retrieve(
             paymentIntentId
-          )
-          if(paymentIntent.status !== "succeeded"){
-            return next(new ErrorHandler(`Payment not authorized!`, 400))
+          );
+          if (paymentIntent.status !== "succeeded") {
+            return next(new ErrorHandler(`Payment not authorized!`, 400));
           }
         }
       }
@@ -85,7 +85,7 @@ export const createOrder = CatchAsyncError(
       }
       user?.courses.push(course?._id);
 
-      await redis.set(req.user?._id, JSON.stringify(user)); 
+      await redis.set(req.user?._id, JSON.stringify(user));
 
       await user?.save();
 
@@ -119,7 +119,7 @@ export const getAllOrders = CatchAsyncError(
 export const sendStripePublishableKey = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     res.status(200).json({
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+      publishableKey: `${process.env.STRIPE_PUBLISHABLE_KEY}`,
     });
   }
 );
@@ -128,10 +128,22 @@ export const sendStripePublishableKey = CatchAsyncError(
 
 export const newPayment = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
+    console.log(req.body);
     try {
+      console.log(req.body);
       const myPayment = await stripe.paymentIntents.create({
         amount: req.body.amount,
-        currency: "USD",
+        currency: "INR",
+        description: "Course purchase",shipping: {
+          name: "Data",
+          address: {
+            line1: "510 Townsend St",
+            postal_code: "123456",
+            city: "",
+            state: "CA",
+            country: "India",
+          },
+        },
         metadata: {
           company: "ELearning",
         },
