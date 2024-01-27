@@ -3,7 +3,7 @@ import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import OrderModel, { IOrder } from "../models/order.model";
 import userModel, { IUser } from "../models/user.model";
-import CourseModel from "../models/course.model";
+import CourseModel, { ICourse } from "../models/course.model";
 import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
@@ -44,7 +44,7 @@ export const createOrder = CatchAsyncError(
         );
       }
 
-      const course = await CourseModel.findById(courseId);
+      const course:ICourse | null = await CourseModel.findById(courseId);
       if (!course) {
         return next(new ErrorHandler(`Course not found`, 404));
       }
@@ -94,7 +94,9 @@ export const createOrder = CatchAsyncError(
         title: "New order confirmation",
         message: `You have a new order for ${course?.name} from ${user?.name}`,
       });
-      course.purchased ? (course.purchased += 1) : course.purchased;
+
+      course.purchased = course?.purchased + 1;
+      
       await course.save();
       newOrder(data, res, next);
     } catch (error: any) {
