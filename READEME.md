@@ -7,3 +7,6 @@ Tech Stack:
     1) Mongodb Atlas DB
     2) Cloudinary Server for Images storing
     3) Upstash for ioredis
+
+New Dependencies:
+1) express-rate-limit:- Use to set the rate limit for api hitting, like user can hit api 100 times per second
