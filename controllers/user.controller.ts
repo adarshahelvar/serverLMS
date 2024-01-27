@@ -68,7 +68,7 @@ export const registrationUser = CatchAsyncError(
           message: "Check your email to activate your account",
           activationToken: activationToken.token,
         });
-      } catch (error) {
+      } catch (error:any) {
         return next(new ErrorHandler(error.message, 400));
       }
     } catch (error: any) {
@@ -239,7 +239,7 @@ export const updateAccessToken = CatchAsyncError(
       //   accessToken,
       // });
       return next();
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -252,7 +252,7 @@ export const getUserInfo = CatchAsyncError(
     try {
       const userId = req.user?._id;
       getUserById(userId, res);
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -276,7 +276,7 @@ export const socialAuth = CatchAsyncError(
       } else {
         sendToken(user, 200, res);
       }
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -305,7 +305,7 @@ export const updateUserInfo = CatchAsyncError(
         status: "success",
         user,
       });
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -340,7 +340,7 @@ export const updatePassword = CatchAsyncError(
         status: "success",
         user,
       });
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -386,7 +386,7 @@ export const updateProfilePicture = CatchAsyncError(
           user,
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -397,7 +397,7 @@ export const getAllUsers = CatchAsyncError(
   async (req: ExtendedRequest, res: Response, next: NextFunction) => {
     try {
       getAllUsersService(res);
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -419,7 +419,7 @@ export const updateUserRole = CatchAsyncError(
           message: "User not found",
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -440,7 +440,7 @@ export const deleteUser = CatchAsyncError(
       res.status(200).json({
         status: "User deleted successfully",
       });
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }

@@ -12,8 +12,7 @@ export const createCourse = CatchAsyncError(async (data:any, res: Response) => {
             message: "Course created successfully",
             course,
         });
-    } catch (error) {
-        console.error(error);
+    } catch (error:any) {
         res.status(500).json({
             success: false,
             message: "Failed to create course",

@@ -15,13 +15,11 @@ import path from "path";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
 import axios from "axios";
+import { IUser } from "../models/user.model";
 
 // Extend the Request interface to include user property
 interface CustomRequest extends Request {
-  user?: {
-    courses: Array<{ _id: string }>; // Update this type according to your user model
-    name: string;
-  };
+  user?: IUser
 }
 
 // Upload course
@@ -447,7 +445,7 @@ export const getAdminAllCourses = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
       getAllCoursesService(res);
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -468,7 +466,7 @@ export const deleteCourse = CatchAsyncError(
       res.status(200).json({
         status: "Course deleted successfully",
       });
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -492,7 +490,7 @@ export const generateVideoUrl = CatchAsyncError(
         }
       );
       res.json(response.data);
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }

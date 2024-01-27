@@ -80,7 +80,7 @@ export const createOrder = CatchAsyncError(
             data: mailData,
           });
         }
-      } catch (error) {
+      } catch (error:any) {
         return next(new ErrorHandler(error.message, 500));
       }
       user?.courses.push(course?._id);
@@ -110,7 +110,7 @@ export const getAllOrders = CatchAsyncError(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
       getAllOrdersService(res);
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -157,7 +157,7 @@ export const newPayment = CatchAsyncError(
         success: true,
         client_secret: myPayment.client_secret,
       });
-    } catch (error) {
+    } catch (error:any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
