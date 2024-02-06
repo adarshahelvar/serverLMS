@@ -17,7 +17,8 @@ exports.refreshTokenOptions = {
     expire: new Date(Date.now() + exports.refreshTokenExpire * 24 * 60 * 60 * 1000),
     maxAge: exports.refreshTokenExpire * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
+    secure: true,
 };
 const sendToken = (user, statusCode, res) => {
     const accessToken = user.SignAccessToken();
@@ -25,9 +26,10 @@ const sendToken = (user, statusCode, res) => {
     // Upload session to redis for maintaining cache
     redis_1.redis.set(user._id, JSON.stringify(user));
     //   Only set secure to true in production
-    if (process.env.NODE_ENV === "production") {
-        exports.accessTokenOptions.secure = true;
-    }
+    // if (process.env.NODE_ENV === "production") {
+    // Commenting because added in top as secure: true,
+    //   accessTokenOptions.secure = true;
+    // }
     // Exclude the password field from the user object
     const userWithoutPassword = { ...user.toObject(), password: undefined };
     res.cookie("access_token", accessToken, exports.accessTokenOptions);

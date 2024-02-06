@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Replay Notification</title>
+    <style type="text/css">
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        color: #000; /* Set font color to black */
+      }
+      .container {
+        max-width: 600px;
+        height: 100vh;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #4f5ef1; /* Set border color */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: #000; /* Set font color to black */
+      }
+      .message-sm { /* Apply the same styles to .footer as .message-sm */
+        text-align: center;
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-top: 50px;
+        padding-bottom: 50px; 
+        background-color: #3498db; 
+        color: #fff; 
+      }
+      .course-info {
+        margin-top: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
+      table, td {
+        border: 1px solid #0000002f;
+        color: #000; /* Set font color to black */
+      }
+      .first-td {
+        text-align: center;
+        padding: 8px;
+      }
+      .second-td {
+        text-align: center;
+        padding: 8px;
+      }
+      .table-row {
+        border-top: 1px solid #00000029;
+      }
+      .col-2 {
+        text-align: center;
+        padding: 8px;
+        font-weight: bold;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+      .footer { 
+        margin-top: 5%;
+        text-align: center;
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-top: 50px;
+        padding-bottom: 50px; 
+        background-color: #34d0db; 
+        color: #fff; 
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="message-sm">
+        <h1>Your E-Learning order is confirmed...!</h1>
+        <p>And we're just as excited as you are.</p>
+      </div>
+      <div class="course-info">
+        <h4>Here's what you have ordered:</h4>
+        <table style="border-bottom: 1px solid #0000002f">
+          <tr>
+            <td>Order #: <%= order._id %></td>
+            <td>Order Date: <%= order.date %></td>
+          </tr>
+        </table>
+        <table style="width: 90%; margin: auto;">
+          <tr>
+            <td class="first-td">Item</td>
+            <td class="first-td">Quantity</td>
+            <td class="first-td">Cost</td>
+          </tr>
+          <tr>
+            <td class="second-td"><%= order.name %></td>
+            <td class="second-td">1</td>
+            <td class="second-td"><%= order.price %></td>
+          </tr>
+          <tr>
+            <td class="col-2">Subtotal:</td>
+            <td class="col-2"><%= order.price %></td>
+          </tr>
+        </table>
+      </div>
+      <div class="footer">
+        <p>
+          If you have any questions, please contact our support team at
+          <a href="mailto:adarshaadi1997@gmail.com">adarshaadi1997@gmail.com</a>
+        </p>
+        <p>&copy; 2023 E-Learning. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

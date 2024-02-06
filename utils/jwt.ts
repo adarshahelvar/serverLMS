@@ -36,7 +36,8 @@ export const refreshTokenOptions: ITokenOptions = {
   expire: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
   maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: "none",
+  secure: true,
 };
 
 export const sendToken = (user: IUser, statusCode: number, res: Response) => {
@@ -49,9 +50,10 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   
 
   //   Only set secure to true in production
-  if (process.env.NODE_ENV === "production") {
-    accessTokenOptions.secure = true;
-  }
+  // if (process.env.NODE_ENV === "production") {
+    // Commenting because added in top as secure: true,
+  //   accessTokenOptions.secure = true;
+  // }
   // Exclude the password field from the user object
   const userWithoutPassword = { ...user.toObject(), password: undefined };
 
