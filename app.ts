@@ -30,7 +30,9 @@ app.use(cookieParser());
 // );
 app.use(
   cors({
+
     origin: ['https://elearningadarshahelvar.vercel.app', 'http://localhost:3000'],
+
     credentials: true,
   })
 );
